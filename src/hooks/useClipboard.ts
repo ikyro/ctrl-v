@@ -48,6 +48,8 @@ export const useClipboard = () => {
     setBase64Url(base64)
     setFileType(file.type)
 
+    console.log({ base64 })
+
     await navigator.clipboard
       .writeText(blob)
       .then(() => toast.success('Copied to clipboard!'))
