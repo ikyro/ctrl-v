@@ -1,5 +1,3 @@
-import { Clipboard } from '../hooks/useClipboard'
-
 export const Preview = ({
   base64Url,
   fileType,
@@ -15,12 +13,12 @@ export const Preview = ({
           <img
             src={base64Url}
             alt='paste image'
-            className='mx-auto rounded object-cover w-64 h-64 md:w-full md:h-full'
+            className='mx-auto h-64 w-64 max-w-xs rounded object-cover md:h-full md:w-full'
           />
         ) : fileType?.includes('video') ? (
           <video
             src={base64Url}
-            className='mx-auto rounded w-64 h-64'
+            className='mx-auto h-64 w-64 max-w-xs rounded md:h-full md:w-full'
             controls
           />
         ) : fileType?.includes('audio') ? (
