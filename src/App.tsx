@@ -1,12 +1,21 @@
 import { Toaster } from 'react-hot-toast'
-import { Form } from './components/Form'
+import { Header } from './components/Header'
+import { Paste } from './components/Paste'
 import { Preview } from './components/Preview'
 import { SelectFiles } from './components/SelectFiles'
+import { ShowUrl } from './components/ShowUrl'
 import { useClipboard } from './hooks/useClipboard'
 
 const App = () => {
-  const { clipboard, handleCopyFromLocalFiles, handleDragOver, handleDrop } =
-    useClipboard()
+  const {
+    handleCopyFromLocalFiles,
+    handleDragOver,
+    handleDrop,
+    handleClickPaste,
+    base64Url,
+    blobUrl,
+    fileType,
+  } = useClipboard()
 
   return (
     <>
@@ -15,15 +24,15 @@ const App = () => {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        <h1 className='absolute top-[4.5rem] font-grotesk text-3xl font-bold leading-tight tracking-tight lg:top-40'>
-          CTRL + V
-        </h1>
-        <main className='relative'>
-          <Form />
-
+        <Header />
+        <main className='relative flex flex-col items-center justify-center gap-0.5 md:gap-1'>
+          <Paste onClick={handleClickPaste} />
           <SelectFiles onClick={handleCopyFromLocalFiles} />
 
-          <Preview clipboard={clipboard} />
+          <ShowUrl placeholder='Blob URL' url={blobUrl} />
+          <ShowUrl placeholder='Base64 URL' url={base64Url} />
+
+          <Preview {...{ base64Url, fileType }} />
         </main>
       </div>
       <Toaster
