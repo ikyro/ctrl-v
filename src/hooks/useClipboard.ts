@@ -1,23 +1,75 @@
 import { DragEvent, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
-export type Clipboard =
-  | {
-      url: string
-      type: string
-    }
-  | undefined
+export type Clipboard = {
+  url: {
+    blob: string
+    base64: string
+  }
+  type: string
+} | null
+
+const getBase64Url = ({ file }: { file: File | Blob }) => {
+  return new Promise<{ base64: string }>((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.addEventListener(
+      'load',
+      () => {
+        resolve({ base64: reader.result as string })
+      },
+      false
+    )
+
+    reader.addEventListener('error', (error) => reject(error), false)
+
+    reader.readAsDataURL(file)
+  })
+}
+
+const getBlobUrl = ({ file }: { file: File | Blob }) => {
+  const url = URL.createObjectURL(file)
+
+  return {
+    blob: url,
+  }
+}
 
 export const useClipboard = () => {
-  const [clipboard, setClipboard] = useState<Clipboard>()
+  const [blobUrl, setBlobUrl] = useState<string>()
+  const [base64Url, setBase64Url] = useState<string>()
+  const [fileType, setFileType] = useState<string>()
 
-  const fileToUrl = async ({ file }: { file: File }) => {
-    const url = URL.createObjectURL(file)
-    toast.success('Copied to clipboard!')
+  const fileToUrl = async ({ file }: { file: File | Blob }) => {
+    const { blob } = getBlobUrl({ file })
+    const { base64 } = await getBase64Url({ file })
 
-    await navigator.clipboard.writeText(url)
+    setBlobUrl(blob)
+    setBase64Url(base64)
+    setFileType(file.type)
 
-    setClipboard({ url, type: file.type })
+    await navigator.clipboard
+      .writeText(blob)
+      .then(() => toast.success('Copied to clipboard!'))
+      .catch(() => toast.error('Failed to copy in to clipboard!'))
+  }
+
+  const handleClickPaste = async () => {
+    const [clipboard] = await navigator.clipboard.read()
+    const [blob] = await Promise.all(
+      Object.values(clipboard.types)
+        .filter(
+          (type) =>
+            type.includes('image') ||
+            type.includes('video') ||
+            type.includes('audio')
+        )
+        .map((type) => clipboard.getType(type))
+    )
+
+    if (!blob) return
+
+    fileToUrl({ file: blob })
   }
 
   const handlePaste = async (event: ClipboardEvent) => {
@@ -86,9 +138,12 @@ export const useClipboard = () => {
   }, [])
 
   return {
-    clipboard,
+    blobUrl,
+    base64Url,
+    fileType,
     handleCopyFromLocalFiles,
     handleDragOver,
     handleDrop,
+    handleClickPaste,
   }
 }
