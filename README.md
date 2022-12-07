@@ -1,6 +1,8 @@
 ## CTRL + V
 
-convert any file to url `suport to drag and drop` and mobile
+convert any file to url
+
+<small>suport to drag and drop and mobile</small>
 
 # Install
 
