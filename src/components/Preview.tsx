@@ -1,28 +1,30 @@
 import { Clipboard } from '../hooks/useClipboard'
 
-export const Preview = ({ clipboard }: { clipboard: Clipboard }) => {
+export const Preview = ({
+  base64Url,
+  fileType,
+}: {
+  base64Url?: string
+  fileType?: string
+}) => {
   return (
     <>
       <p className='mt-2 text-center font-grotesk tracking-tight'>Preview:</p>
-      {clipboard ? (
-        clipboard.type.includes('image') ? (
+      {base64Url && fileType ? (
+        fileType?.includes('image') ? (
           <img
-            src={clipboard.url}
+            src={base64Url}
             alt='paste image'
-            width={250}
-            height={250}
-            className='mx-auto rounded object-cover'
+            className='mx-auto rounded object-cover w-64 h-64 md:w-full md:h-full'
           />
-        ) : clipboard.type.includes('video') ? (
+        ) : fileType?.includes('video') ? (
           <video
-            src={clipboard.url}
-            width={250}
-            height={250}
-            className='mx-auto rounded'
+            src={base64Url}
+            className='mx-auto rounded w-64 h-64'
             controls
           />
-        ) : clipboard.type.includes('audio') ? (
-          <audio src={clipboard.url} className='mx-auto' controls />
+        ) : fileType?.includes('audio') ? (
+          <audio src={base64Url} className='mx-auto' controls />
         ) : (
           <p className='mt-2 text-center font-grotesk tracking-tight'>
             format not previewable
