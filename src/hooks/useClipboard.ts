@@ -1,46 +1,20 @@
-import { DragEvent, useEffect, useState } from 'react'
+import { ChangeEvent, DragEvent, useEffect, useState } from 'react'
+import { readClipboard, writeClipboard } from '../utils/clipboard'
+import { getBase64Url, getBlobUrl } from '../utils/url'
 import toast from 'react-hot-toast'
 
-export type Clipboard = {
-  url: {
-    blob: string
-    base64: string
-  }
-  type: string
-} | null
-
-const getBase64Url = ({ file }: { file: File | Blob }) => {
-  return new Promise<{ base64: string }>((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.addEventListener(
-      'load',
-      () => {
-        resolve({ base64: reader.result as string })
-      },
-      false
-    )
-
-    reader.addEventListener('error', (error) => reject(error), false)
-
-    reader.readAsDataURL(file)
-  })
-}
-
-const getBlobUrl = ({ file }: { file: File | Blob }) => {
-  const url = URL.createObjectURL(file)
-
-  return {
-    blob: url,
-  }
+export type UseClipboard = {
+  blobUrl?: string
+  base64Url?: string
+  fileType?: string
 }
 
 export const useClipboard = () => {
-  const [blobUrl, setBlobUrl] = useState<string>()
-  const [base64Url, setBase64Url] = useState<string>()
-  const [fileType, setFileType] = useState<string>()
+  const [blobUrl, setBlobUrl] = useState<UseClipboard['blobUrl']>()
+  const [base64Url, setBase64Url] = useState<UseClipboard['base64Url']>()
+  const [fileType, setFileType] = useState<UseClipboard['fileType']>()
 
-  const fileToUrl = async ({ file }: { file: File | Blob }) => {
+  const showNotify = async ({ file }: { file: File | Blob }) => {
     const { blob } = getBlobUrl({ file })
     const { base64 } = await getBase64Url({ file })
 
@@ -50,81 +24,61 @@ export const useClipboard = () => {
 
     console.log({ base64 })
 
-    await navigator.clipboard
-      .writeText(blob)
+    await writeClipboard({ text: blob })
       .then(() => toast.success('Copied to clipboard!'))
       .catch(() => toast.error('Failed to copy in to clipboard!'))
   }
 
   const handleClickPaste = async () => {
-    const [clipboard] = await navigator.clipboard.read()
-    const [blob] = await Promise.all(
-      Object.values(clipboard.types)
-        .filter(
-          (type) =>
-            type.includes('image') ||
-            type.includes('video') ||
-            type.includes('audio')
-        )
-        .map((type) => clipboard.getType(type))
-    )
-
-    if (!blob) return
-
-    fileToUrl({ file: blob })
-  }
-
-  const handlePaste = async (event: ClipboardEvent) => {
-    const clipboardData = event.clipboardData?.items
-
-    const [file] = Object.values(clipboardData as DataTransferItemList)
-      .filter((item) => item.kind === 'file')
-      .map((item) => item.getAsFile())
+    const { file } = await readClipboard()
 
     if (!file) return
 
-    await fileToUrl({ file })
+    showNotify({ file })
   }
 
-  const handleCopyFromLocalFiles = async () => {
-    const types: FilePickerOptions['types'] = [
-      {
-        description: 'Files to convert to URL',
-        accept: {
-          'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'],
-          'video/*': ['.mp4', '.webm', '.mov'],
-          'audio/*': ['.mp3', '.wav', '.ogg'],
+  const handlePaste = async (event: ClipboardEvent) => {
+    const { file } = await readClipboard(event)
+
+    if (!file) return
+
+    await showNotify({ file })
+  }
+
+  const handleClick = async () => {
+    const [file] = await window.showOpenFilePicker({
+      excludeAcceptAllOption: true,
+      types: [
+        {
+          description: 'Files to convert to URL',
+          accept: {
+            'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg'],
+            'video/*': ['.mp4', '.webm', '.mov'],
+            'audio/*': ['.mp3', '.wav', '.ogg'],
+          },
         },
-      },
-    ]
+      ],
+    })
+    const fileHandle = await file.getFile()
 
-    if (window?.showOpenFilePicker) {
-      const [file] = await window.showOpenFilePicker({
-        excludeAcceptAllOption: true,
-        types,
-      })
-      const fileHandle = await file.getFile()
-      await fileToUrl({ file: fileHandle })
-    } else {
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.multiple = false
+    await showNotify({ file: fileHandle })
+  }
 
-      input.addEventListener('change', async () => {
-        const [file] = input.files as FileList
-        await fileToUrl({ file })
-      })
+  const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const [file] = event.currentTarget.files as FileList
 
-      input.click()
-    }
+    if (!file) return
+
+    await showNotify({ file })
   }
 
   const handleDrop = async (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault()
     const file = event.dataTransfer.files.item(0)
+
     if (!file) return
 
-    await fileToUrl({ file })
+    await showNotify({ file })
   }
 
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
@@ -143,7 +97,8 @@ export const useClipboard = () => {
     blobUrl,
     base64Url,
     fileType,
-    handleCopyFromLocalFiles,
+    handleClick,
+    handleChange,
     handleDragOver,
     handleDrop,
     handleClickPaste,
