@@ -8,10 +8,11 @@ import { useClipboard } from './hooks/useClipboard'
 
 const App = () => {
   const {
-    handleCopyFromLocalFiles,
     handleDragOver,
     handleDrop,
     handleClickPaste,
+    handleClick,
+    handleChange,
     base64Url,
     blobUrl,
     fileType,
@@ -27,12 +28,12 @@ const App = () => {
         <Header />
         <main className='relative flex flex-col items-center justify-center gap-0.5 md:gap-1'>
           <Paste onClick={handleClickPaste} />
-          <SelectFiles onClick={handleCopyFromLocalFiles} />
+          <SelectFiles onClick={handleClick} onChange={handleChange} />
 
           <ShowUrl placeholder='Blob URL' url={blobUrl} />
           <ShowUrl placeholder='Base64 URL' url={base64Url} />
 
-          <Preview {...{ base64Url, fileType }} />
+          <Preview base64Url={base64Url} fileType={fileType} />
         </main>
       </div>
       <Toaster
