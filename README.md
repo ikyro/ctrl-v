@@ -9,3 +9,7 @@ convert any file to url
 ```sh
 npm i
 ```
+
+# Design
+
+Design inspired by [reactjs.wiki](https://www.reactjs.wiki/)
