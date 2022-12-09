@@ -85,14 +85,6 @@ export const useClipboard = () => {
     event.preventDefault()
   }
 
-  useEffect(() => {
-    window.document.documentElement.addEventListener('paste', handlePaste)
-
-    return () => {
-      window.document.documentElement.removeEventListener('paste', handlePaste)
-    }
-  }, [])
-
   return {
     blobUrl,
     base64Url,
