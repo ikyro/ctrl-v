@@ -29,7 +29,7 @@ export const Preview = ({
           </p>
         )
       ) : (
-        <div className='mx-auto h-64 w-64 max-w-xs animate-pulse rounded bg-gray-300 md:h-full md:w-full' />
+        <div className='mx-auto h-64 w-64 max-w-xs animate-pulse rounded bg-gray-300' />
       )}
     </>
   )
