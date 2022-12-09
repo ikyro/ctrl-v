@@ -29,10 +29,14 @@ export const useClipboard = () => {
       .catch(() => toast.error('Failed to copy in to clipboard!'))
   }
 
+  const showNotifyError = () => {
+    toast.error('File not found in clipboard!')
+  }
+
   const handleClickPaste = async () => {
     const { file } = await readClipboard()
 
-    if (!file) return
+    if (!file) return showNotifyError()
 
     showNotify({ file })
   }
@@ -40,7 +44,7 @@ export const useClipboard = () => {
   const handlePaste = async (event: ClipboardEvent) => {
     const { file } = await readClipboard(event)
 
-    if (!file) return
+    if (!file) return showNotifyError()
 
     await showNotify({ file })
   }
@@ -67,7 +71,7 @@ export const useClipboard = () => {
   const handleChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const [file] = event.currentTarget.files as FileList
 
-    if (!file) return
+    if (!file) return showNotifyError()
 
     await showNotify({ file })
   }
@@ -76,7 +80,7 @@ export const useClipboard = () => {
     event.preventDefault()
     const file = event.dataTransfer.files.item(0)
 
-    if (!file) return
+    if (!file) return showNotifyError()
 
     await showNotify({ file })
   }

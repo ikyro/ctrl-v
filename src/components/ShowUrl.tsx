@@ -8,7 +8,7 @@ export const ShowUrl = ({
   placeholder: string
 }) => {
   const handleClick = async () => {
-    if (!url?.length) return
+    if (!url?.length) return toast.error('URL does not exist!')
 
     await navigator.clipboard
       .writeText(url)
