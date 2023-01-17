@@ -1,35 +1,16 @@
 {
-  "name": "ctrl-v",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@example/basics",
   "type": "module",
+  "version": "0.0.1",
+  "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "coverage": "vitest run --coverage",
-    "test:actions": "vitest run"
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-hot-toast": "^2.4.0"
-  },
-  "devDependencies": {
-    "@testing-library/react": "^13.4.0",
-    "@types/react": "^18.0.24",
-    "@types/react-dom": "^18.0.8",
-    "@types/wicg-file-system-access": "^2020.9.5",
-    "@vitejs/plugin-react": "^2.2.0",
-    "autoprefixer": "^10.4.13",
-    "happy-dom": "^8.1.0",
-    "postcss": "^8.4.19",
-    "prettier-plugin-tailwindcss": "^0.2.0",
-    "tailwindcss": "^3.2.4",
-    "typescript": "^4.6.4",
-    "vite": "^3.2.3",
-    "vite-plugin-fonts": "^0.6.0",
-    "vitest": "^0.25.6"
+    "astro": "^1.9.0"
   }
 }
