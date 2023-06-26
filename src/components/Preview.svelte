@@ -4,17 +4,15 @@
 
   const openPreview = (event: MouseEvent) => {
     if (!url) return
+    if (!event.ctrlKey) return
 
-    if (!event.altKey) return
-
-    window.open(url, '_blank')
+    window.open(url, '_blank')?.focus()
   }
 </script>
 
-<p class="mt-2 text-center font-grotesk tracking-tight">Preview:</p>
+<p class="mt-2 text-center font-grotesk tracking-tight dark:text-white">Preview:</p>
 {#if url && type}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div on:click={openPreview}>
+  <button on:click={openPreview} role="link" tabindex={0}>
     {#if type.includes('image')}
       <img
         src={url}
@@ -32,9 +30,9 @@
     {:else if type.includes('audio')}
       <audio src={url} controls />
     {/if}
-  </div>
+  </button>
 {:else}
   <div
-    class="mx-auto h-64 w-64 animate-pulse rounded bg-gray-300 lg:h-80 lg:w-80"
+    class="mx-auto h-64 w-64 animate-pulse rounded bg-gray-300 dark:bg-gray-600 lg:h-80 lg:w-80"
   />
 {/if}
