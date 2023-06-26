@@ -11,5 +11,6 @@ import react from "@astrojs/react";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [svelte(), tailwind(), react()]
+  integrations: [svelte(), tailwind(), react()],
+  site: 'https://ctrl-v-one.vercel.app/'
 });
